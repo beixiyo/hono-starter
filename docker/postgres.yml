@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:18.1-alpine3.23
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: my_user
+      POSTGRES_PASSWORD: my_password
+      POSTGRES_DB: my_database
+      TZ: Asia/Shanghai
+    ports:
+      - "5432:5432"
+    volumes:
+      - ${HOME}/docker-data/postgres/data:/var/lib/postgresql
+      - ${HOME}/docker-data/postgres/init:/docker-entrypoint-initdb.d

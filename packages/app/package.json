@@ -1,0 +1,43 @@
+{
+  "name": "app",
+  "version": "0.0.1",
+  "private": true,
+  "exports": {
+    ".": "./src/index.ts",
+    "./rpc": {
+      "types": "./dist/rpc.d.ts",
+      "default": "./src/rpc.ts"
+    }
+  },
+  "scripts": {
+    "dev": "bun --env-file=./env/.env.development run --hot src/index.ts",
+    "test": "bun --env-file=./env/.env.test test",
+    "lint": "eslint src --fix --quiet",
+    "======== build =========": "=================",
+    "build:clean": "rm -rf ./dist",
+    "build:gen": "bun run ./scripts/gen-modules.ts",
+    "build:bundle": "bun build ./src/index.ts --target bun --outdir ./dist --minify --sourcemap",
+    "build:copy-drizzle": "[ -d ./drizzle ] && cp -r ./drizzle ./dist/drizzle || true",
+    "build": "bun run build:clean && bun run build:gen && bun run build:bundle && bun run build:copy-drizzle && bun run build:rpc",
+    "build:rpc": "bun x dts-bundle-generator -o dist/rpc.d.ts src/rpc.ts --project tsconfig.json --no-check",
+    "compile": "bun build ./src/index.ts --compile --outfile dist/server",
+    "======== db =========": "=================",
+    "db:push": "bun x drizzle-kit push",
+    "db:generate": "bun x drizzle-kit generate",
+    "db:migrate": "bun x drizzle-kit migrate"
+  },
+  "dependencies": {
+    "@hono/zod-openapi": "^1.2.2",
+    "di": "workspace:*",
+    "drizzle-orm": "^0.45.1",
+    "hono": "^4.12.5",
+    "pg": "^8.20.0",
+    "utils": "workspace:*",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@scalar/hono-api-reference": "^0.9.40",
+    "@types/pg": "^8.18.0",
+    "dts-bundle-generator": "^9.5.1"
+  }
+}

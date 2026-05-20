@@ -1,0 +1,30 @@
+{
+  "name": "di",
+  "version": "0.0.1",
+  "description": "Dependency Injection and unified module management",
+  "keywords": [
+    "di",
+    "controller",
+    "module",
+    "management"
+  ],
+  "private": true,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./hono": "./src/adapters/hono/index.ts"
+  },
+  "dependencies": {
+    "@hono/zod-openapi": "^1.2.2",
+    "hono": "^4.12.5"
+  },
+  "peerDependencies": {
+    "@hono/zod-openapi": ">=1.0.0",
+    "hono": ">=4.0.0"
+  },
+  "scripts": {
+    "test": "bun test",
+    "build": "bun build ./src/index.ts --target bun --outdir ./dist --minify"
+  }
+}

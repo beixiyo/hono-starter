@@ -1,0 +1,24 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Bun: Debug App",
+      "type": "bun",
+      "request": "launch",
+      "program": "${workspaceFolder}/packages/app/src/index.ts",
+      "cwd": "${workspaceFolder}/packages/app",
+      "runtimeArgs": ["--env-file=./env/.env.development", "--hot"],
+      "watchMode": false,
+      "noDebug": false
+    },
+    {
+      "name": "Bun: Debug Current File",
+      "type": "bun",
+      "request": "launch",
+      "program": "${file}",
+      "cwd": "${fileDirname}",
+      "watchMode": false,
+      "noDebug": false
+    }
+  ]
+}

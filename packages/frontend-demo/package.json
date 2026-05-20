@@ -1,0 +1,13 @@
+{
+  "name": "frontend-demo",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "dev": "bun run src/index.ts"
+  },
+  "dependencies": {
+    "hono": "^4.12.5",
+    "app": "workspace:*"
+  }
+}

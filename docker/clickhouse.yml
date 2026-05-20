@@ -1,0 +1,24 @@
+services:
+  clickhouse:
+    image: clickhouse/clickhouse-server:24.1  # 明确版本，避免 latest 自动升级
+    container_name: clickhouse
+    ports:
+      - "8123:8123"  # HTTP 接口端口，REST / SQL over HTTP，一般用于应用直连和简单调试
+      - "9000:9000"  # 原生 TCP 协议端口，clickhouse-client 及官方客户端默认使用
+    environment:
+      - CLICKHOUSE_DB=default                  # 默认创建并使用的数据库名
+      - CLICKHOUSE_USER=admin                  # 默认登录用户名
+      - CLICKHOUSE_PASSWORD=your_password      # 默认用户密码（请改成强密码，避免暴露风险）
+      - CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT=1 # 启用内置 RBAC / 用户&权限管理，细粒度使用 SQL 管理权限
+    ulimits:
+      nofile:                                  # 调整进程级文件句柄上限（fd），适配大量连接和文件
+        soft: 262144                           # 软限制，进程实际可用值
+        hard: 262144                           # 硬限制，系统允许设置的最大上限
+    volumes:
+      - ${HOME}/docker-data/clickhouse/data:/var/lib/clickhouse
+      - ${HOME}/docker-data/clickhouse/logs:/var/log/clickhouse-server
+    cap_add:       # 额外授予容器的 Linux 能力，用于性能优化和网络调优
+      - SYS_NICE   # 允许调整进程优先级（nice 值），提升 ClickHouse 线程调度表现
+      - NET_ADMIN  # 允许进行部分网络相关配置（如 TCP 参数调优）
+      - IPC_LOCK   # 允许锁定内存，减少被 swap 影响，提升延迟稳定性
+    restart: always

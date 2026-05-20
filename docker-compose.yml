@@ -1,0 +1,14 @@
+services:
+  app:
+    image: oven/bun:1.3.10-alpine
+    working_dir: /app
+    restart: unless-stopped
+    ports:
+      - "3002:3002"
+    volumes:
+      # 该目录需要“包含 index.js”，会被挂载到容器的 /app/dist
+      # 例：服务器上 publish 解压到 /home/ubuntu/workspace/web（里面就是 index.js）
+      - "./packages/app/dist:/app/dist:ro"
+      # 持久化静态/上传目录（你的 dist/index.js 会写入 /app/public/uploads）
+      - "./packages/app/public:/app/public:rw"
+    command: ["bun", "run", "/app/dist/index.js"]
