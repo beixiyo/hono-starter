@@ -1,13 +1,13 @@
 import {
   index,
   integer,
-  jsonb,
   numeric,
   text,
   timestamp,
   uuid,
   varchar,
 } from 'drizzle-orm/pg-core'
+import { jsonb } from '../columns'
 import { dashboard } from './constants'
 
 /**

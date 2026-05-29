@@ -157,7 +157,7 @@ export class UserController {
 }
 ```
 
-第二参数传入 `createRoute()` 返回的路由对象，DI 框架会自动提取 Zod schema 做参数校验。
+第二参数传入 `createRoute()` 返回的路由对象，DI 框架会自动提取 Zod schema 做参数校验
 
 ### 参数注入装饰器
 
@@ -228,7 +228,7 @@ export const userApi = {
 
 ## RPC 类型共享
 
-项目通过 Hono 的 `hc()` 实现前后端类型共享，**无需 codegen**。
+项目通过 Hono 的 `hc()` 实现前后端类型共享，**无需 codegen**
 
 ### 1. 后端：聚合路由，导出 AppType
 
@@ -281,11 +281,11 @@ const userRes = await client.users[':id'].$get({ param: { id: 'user_123' } })
 
 ## 模块自动加载
 
-开发时 Bun 动态扫描 `modules/` 下所有 `.ts` 文件（排除 `index.ts`、`.test.ts`、`.d.ts`）并 `import`，装饰器副作用注册到全局 pending 列表。
+开发时 Bun 动态扫描 `modules/` 下所有 `.ts` 文件（排除 `index.ts`、`.test.ts`、`.d.ts`）并 `import`，装饰器副作用注册到全局 pending 列表
 
-生产时由 `modules/auto-import.ts` 静态导入（需执行 `bun run build:modules` 或对应脚本生成）。
+生产时由 `modules/auto-import.ts` 静态导入（需执行 `bun run build:modules` 或对应脚本生成）
 
-**新增模块时**，在 `auto-import.ts` 手动补充 import，或重新运行生成脚本。
+**新增模块时**，在 `auto-import.ts` 手动补充 import，或重新运行生成脚本
 
 ---
 
@@ -318,7 +318,7 @@ logger.info('信息')
 logger.error('错误', err)
 ```
 
-基于 `@jl-org/log/node` 的 `NodeLogger`，前缀为 `App`。项目内**禁止**另建日志实例。
+基于 `@jl-org/log/node` 的 `NodeLogger`，前缀为 `App`。项目内**禁止**另建日志实例
 
 ---
 
@@ -328,3 +328,4 @@ logger.error('错误', err)
 - **错误处理与 OpenAPI**：`src/core`
 - **响应格式**：统一经 `wrapResponseFn` 包装，返回 `{ success, message, data, requestId }`
 - **测试**：Bun 内置测试，文件命名 `*.test.ts`，可用 `startApp({ load: false })` 注入 mock
+- **⚠️ jsonb 列必须用 `src/db/columns.ts` 的 `jsonb`，禁止从 `drizzle-orm/pg-core` 引入 jsonb**：drizzle 内置 `jsonb` 与 `bun-sql` 驱动会各序列化一次，把对象/数组存成字符串标量（`jsonb_typeof = 'string'`），令 `@>`、`->`、`-` 等操作符**静默失效**（读取因兜底 `JSON.parse` 暂时正常而极隐蔽）。这是 drizzle-orm 上游 bug（drizzle-team/drizzle-orm#4942、#5139）。`src/db/columns.ts` 的自定义 `jsonb`（写入不 stringify、读取兜底 parse）已规避——新增 jsonb 列直接 `import { jsonb } from '../columns'` 即可，调用方式不变
