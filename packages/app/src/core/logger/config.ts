@@ -11,22 +11,16 @@ export interface LogRouteFilter {
 }
 
 export interface LoggerConfig {
-  level: string
-
-  console: {
-    enabled: boolean
-    colorize: boolean
-  }
+  /** 日志级别，`'debug'` 时输出 debug 日志，其余级别仅过滤 debug（jl-log 无层级阈值） */
+  level: 'debug' | 'info'
 
   file: {
     enabled: boolean
     dir: string
-    /** @default 'daily' */
-    frequency?: 'daily' | 'hourly' | number
-    /** @default '10m' */
+    /** 轮转周期 @default 'daily' */
+    frequency?: 'daily' | 'hourly'
+    /** 单文件大小上限，rotating-file-stream 语法（B/K/M/G）@default '10M' */
     maxSize?: string
-    /** @default '.log' */
-    extension?: string
   }
 
   request: LogRouteFilter
@@ -37,17 +31,12 @@ export const defaultLoggerConfig: LoggerConfig = {
     ? 'info'
     : 'debug',
 
-  console: {
-    enabled: true,
-    colorize: !isProd(),
-  },
-
   file: {
-    enabled: isProd(),
+    /** 生产默认落盘；开发可临时 `LOG_FILE=true` 开启文件日志做验证，无需改代码 */
+    enabled: isProd() || process.env.LOG_FILE === 'true',
     dir: LOG_DIR,
     frequency: 'daily',
-    maxSize: '10m',
-    extension: '.log',
+    maxSize: '10M',
   },
 
   request: {

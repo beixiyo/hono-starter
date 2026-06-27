@@ -1,10 +1,10 @@
+import type { NodeLogger } from '@jl-org/log/node'
 import type { Context, Env, MiddlewareHandler } from 'hono'
-import type { Logger } from 'pino'
 import type { LogRouteFilter } from './config'
 import { shouldLogRoute } from './match'
 
 export interface RequestLoggerOptions {
-  logger: Logger
+  logger: NodeLogger
   filter?: LogRouteFilter
 }
 
@@ -37,10 +37,10 @@ export function requestLogger<E extends Env>(options: RequestLoggerOptions): Mid
     const msg = `${method} ${path} ${status} ${duration}ms`
 
     if (status >= 400) {
-      logger.warn(meta, msg)
+      logger.warn(msg, { meta })
     }
     else {
-      logger.info(meta, msg)
+      logger.info(msg, { meta })
     }
   }
 }

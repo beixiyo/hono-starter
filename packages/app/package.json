@@ -28,10 +28,12 @@
   },
   "dependencies": {
     "@hono/zod-openapi": "^1.2.2",
+    "@jl-org/log": "^2.1.0",
     "di": "workspace:*",
     "drizzle-orm": "^0.45.1",
     "hono": "^4.12.5",
     "pg": "^8.20.0",
+    "rotating-file-stream": "^3.2.9",
     "utils": "workspace:*",
     "zod": "^4.3.6"
   },

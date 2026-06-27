@@ -1,5 +1,5 @@
+import type { NodeLogger } from '@jl-org/log/node'
 import type { Context, Env } from 'hono'
-import type { Logger } from 'pino'
 import type { ZodError } from 'zod'
 
 interface ValidationResult {
@@ -8,7 +8,7 @@ interface ValidationResult {
 }
 
 export interface ValidationHookOptions {
-  logger: Logger
+  logger: NodeLogger
 }
 
 export function createValidationHook({ logger }: ValidationHookOptions) {
@@ -35,8 +35,8 @@ export function createValidationHook({ logger }: ValidationHookOptions) {
     }
 
     logger.warn(
-      { requestId, method, path, input, errors },
       `参数校验失败 ${method} ${path}`,
+      { meta: { requestId, method, path, input, errors } },
     )
 
     return c.json({

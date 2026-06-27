@@ -62,7 +62,7 @@ export async function runPgMigrations(migrationsFolder?: string): Promise<void> 
     logger.info('PostgreSQL 迁移完成')
   }
   catch (err) {
-    logger.error({ err }, 'PostgreSQL 迁移失败')
+    logger.error('PostgreSQL 迁移失败', err)
     throw err
   }
 }

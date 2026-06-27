@@ -73,7 +73,7 @@ export async function startApp(options: StartAppOptions = {}) {
       await runPgMigrations()
     }
     catch (error) {
-      logger.error({ err: error }, 'PostgreSQL 迁移失败')
+      logger.error('PostgreSQL 迁移失败', error)
       throw error
     }
   }

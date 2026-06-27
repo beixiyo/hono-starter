@@ -12,8 +12,9 @@ export function errorHandler(err: Error, c: Context) {
   }
 
   logger.error(
-    { err, requestId, method: c.req.method, path: c.req.path },
     `${c.req.method} ${c.req.path} 未捕获异常`,
+    err,
+    { meta: { requestId, method: c.req.method, path: c.req.path } },
   )
 
   return jsonFail(c, err.message || MESSAGE_CONFIG.internalServerErrorDefault, 500)
