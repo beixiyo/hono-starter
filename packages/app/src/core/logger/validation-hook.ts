@@ -1,6 +1,8 @@
 import type { NodeLogger } from '@jl-org/log/node'
-import type { Context, Env } from 'hono'
+import type { Context } from 'hono'
 import type { ZodError } from 'zod'
+import type { AppEnv } from '../../types'
+import { flattenError } from 'zod'
 
 interface ValidationResult {
   success: boolean
@@ -12,13 +14,13 @@ export interface ValidationHookOptions {
 }
 
 export function createValidationHook({ logger }: ValidationHookOptions) {
-  return async (result: ValidationResult, c: Context<Env>) => {
+  return async (result: ValidationResult, c: Context<AppEnv>) => {
     if (result.success)
       return
 
     const requestId = c.get('requestId' as never) as string | undefined
     const { method, path } = c.req
-    const errors = result.error!.flatten()
+    const errors = flattenError(result.error!)
 
     const input: Record<string, unknown> = {
       query: c.req.query(),

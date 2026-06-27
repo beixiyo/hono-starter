@@ -18,8 +18,8 @@ export interface HonoRouteRegistryOptions<E extends Env = Env> {
    * @default (c, data) => c.json(data)
    */
   wrapResponseFn?: (c: Context<E>, data: unknown) => Response
-  /** 传递给每个 OpenAPIHono 子路由的默认校验 hook */
-  defaultHook?: ConstructorParameters<typeof OpenAPIHono>[0] extends infer O
+  /** 传递给每个 OpenAPIHono 子路由的默认校验 hook（跟随注册器的环境泛型 E） */
+  defaultHook?: ConstructorParameters<typeof OpenAPIHono<E>>[0] extends infer O
     ? O extends { defaultHook?: infer H } ? H : never
     : never
 }
