@@ -35,6 +35,8 @@ bun install
 | `bun run -F app dev` | 从根目录启动 app 开发服务 |
 | `bun run -F '*' build` | 构建所有包 |
 | `bun run -F '*' test` | 运行所有包的测试 |
+| `bun run -F app gen:public-types` | 生成供仓库外消费的 DTO 类型 |
+| `bun run -F app gen:public-types:check` | 校验上述产物是否过期（CI 用） |
 
 进入某个包目录后可直接使用该包的脚本：
 
@@ -152,6 +154,15 @@ logger.info('服务启动')
 logger.warn({ userId: '123' }, '用户权限不足')
 logger.error({ err }, '数据库查询失败')   // pino 风格：对象在前，消息在后
 ```
+
+## 前后端类型共享
+
+两条独立通道，按消费方在不在同一个 workspace 里选：
+
+- **workspace 内** → `hc<AppType>()`，`import type { AppType } from 'app/rpc'`，全链路推导、无需 codegen
+- **仓库外** → `bun run -F app gen:public-types` 把 zod schema 派生的 DTO 打成单文件 `types/public-types.d.ts`，消费方只需装 `zod ^4`，不必引入整套 hono
+
+产物是生成物但需提交，`gen:public-types:check` 用于在 CI 里检测它是否已过期。详见 [AGENTS.md](./AGENTS.md) 的「RPC 类型共享」一节
 
 ## 参考
 

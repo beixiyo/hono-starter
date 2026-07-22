@@ -277,6 +277,50 @@ const userRes = await client.users[':id'].$get({ param: { id: 'user_123' } })
 
 路径转换规则：`/users/{id}` → `client.users[':id'].$get()`
 
+### 3. 仓库外消费方：分发 DTO 类型
+
+`hc<AppType>()` 依赖 `"app": "workspace:*"`，只对**同一 workspace 内**的前端有效。独立仓库（不同 git 仓、不同包管理器）解析不到 `app` 这个包，此时走第二条通道：把 zod schema 派生的 DTO 打成单文件 `.d.ts`，消费方只需装 `zod`
+
+| | `./rpc`（`build:rpc`） | `./public-types`（`gen:public-types`） |
+|---|---|---|
+| 内容 | Hono `AppType`，含路由与请求/响应签名 | 纯 DTO 形状 |
+| 用法 | `hc<AppType>()` 全链路推导 | `import type { User } from '<产物路径>'` |
+| 消费方依赖 | `hono` + `zod` | 仅 `zod ^4` |
+| 适用 | workspace 内 | **仓库外** |
+
+```bash
+bun run -F app gen:public-types                      # 生成到 packages/app/types/（本地产物，已 gitignore）
+bun run -F app gen:public-types -- --out <绝对路径>    # 直接写进消费方仓库（实际用法）
+bun run -F app gen:public-types:check -- --out <同上>  # 校验消费方那份是否过期
+```
+
+也可用环境变量 `APP_PUBLIC_TYPES_OUT` 固化消费方路径，省得每次传 `--out`
+
+新模块要对外暴露类型时，照抄 `src/modules/user/public-types.ts`：
+
+```ts
+export type { User } from './schema'
+```
+
+然后在 `src/public-types.ts` 补一行 re-export（与 `rpc.ts` 要手工补 `.openapi()` 的约定一致）
+
+**⚠️ 硬约束**：公共类型入口只能导出 zod schema 的 `z.infer` 派生形状，**不能引用 hono 自有类型**（`RouteConfig` / `OpenAPIHono` / `createRoute` 返回类型等）。否则产物会发射成合并 import，改写不到，生成脚本直接失败：
+
+```
+[gen-public-types] 产物仍引用 @hono，消费方仅装 zod 将无法编译：
+  3: import { RouteConfig, z } from '@hono/zod-openapi';
+```
+
+这是**响亮失败**而非静默产坏产物，失败时目标文件零污染
+
+另外两点：产物只有**形状**，运行时规则不保留（`z.string().min(3)` 只剩 `z.ZodString`）；消费方必须装 **zod v4**（产物用到 `z.core.$strip`）
+
+> **产物归属**：`packages/app/types/` 已被 gitignore，本仓库里那份只是本地构建产物。真正被提交、被 review、被 tsc 检查的那份在**消费方仓库**里（由 `--out` 写进去）。
+>
+> 因此漂移检测应当带 `--out` 指向消费方那份。不带 `--out` 时它比对的是**本地上次生成的**那份（schema 改了没重跑同样会失败），但该文件不进 git，新 clone 上直接报「产物不存在」—— 挂进 CI 没有意义。
+>
+> schema 改了不重新生成，消费方类型会静默过期。本仓库**没有 CI**，请自行把 `gen:public-types:check -- --out <消费方路径>` 挂进流水线或 pre-push，否则这道保护等于不存在
+
 ---
 
 ## 模块自动加载

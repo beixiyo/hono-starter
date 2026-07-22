@@ -6,3 +6,6 @@ dist
 
 packages/app/uploads
 logs
+
+# gen:public-types 的本地产物；真正需要提交的那份在消费方仓库里
+packages/app/types

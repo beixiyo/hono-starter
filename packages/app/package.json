@@ -7,6 +7,9 @@
     "./rpc": {
       "types": "./dist/rpc.d.ts",
       "default": "./src/rpc.ts"
+    },
+    "./public-types": {
+      "types": "./src/public-types.ts"
     }
   },
   "scripts": {
@@ -20,6 +23,8 @@
     "build:copy-drizzle": "[ -d ./drizzle ] && cp -r ./drizzle ./dist/drizzle || true",
     "build": "bun run build:clean && bun run build:gen && bun run build:bundle && bun run build:copy-drizzle && bun run build:rpc",
     "build:rpc": "bun x dts-bundle-generator -o dist/rpc.d.ts src/rpc.ts --project tsconfig.json --no-check",
+    "gen:public-types": "bun run ./scripts/gen-public-types.ts",
+    "gen:public-types:check": "bun run ./scripts/gen-public-types.ts --check",
     "compile": "bun build ./src/index.ts --compile --outfile dist/server",
     "======== db =========": "=================",
     "db:push": "bun x drizzle-kit push",
